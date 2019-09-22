@@ -1,0 +1,64 @@
+Rules
+
+	container is an area of X by Y closed
+
+	each level has to have 1 up stair and 1 down
+		*except 0
+
+	Doors can be any 1 or combination of
+		open
+		closed
+		locked
+		hidden
+
+	Minimum Size is 30 by 30
+	maximum size 1000 by 1000
+
+	maximum depth indefinent but will not save levels beyond 1000
+	and will begin overwriting them as 
+
+	Items do 'decay' either after 200 steps or transitioning from one
+	level to another. That is any dropped item that wasn't part of the
+	original generated level.
+
+	Characters are only tracked on the level you are on.
+
+	Each cell is a string of characters that describe that cell. The 
+	walls surrounding the level are described only as w or wall but
+	in the space cells can have multiple describing characters that
+	can sorta work out to a language of their own. Below is a list
+	of all the characters and their meaning and how they are applied.
+	w - wall
+	d - door
+		1 - closed door
+		2 - open door
+			1 - locked door
+				1 - pickable
+				2 - not pickable
+					'generated name' - key
+	H - hidden anything except w
+	t - trap (these can be stacked)
+		1 - damage
+			{?-?} - damage range
+		2 - reward
+			x - random reward value
+	l - light source (without a local light source an area is dark)
+			 (torch and lantern can be taken)
+		1 - torch
+		2 - fireplace
+		3 - campfire
+		4 - lantern
+	c - spawner (for makin the badies)
+		possible bad guys are created at level generation with
+		a generated name, level based map level range +/-1 of the level number, and set of attributes
+		such as possesions, spells, and intellect which determines how
+		good they are at searching for the player and fighting the
+		player
+	C - chest
+		a chest containing a number {1..5} of goods with partially
+		generated names ie. Bargel Swort, Makrok Meat, Paltor Spell,
+		door key
+	I - item
+		random item generated at level creating similar to chest
+		contents {1..5} in the level
+	
