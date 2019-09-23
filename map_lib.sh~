@@ -14,58 +14,54 @@ tput reset
 echo "Enter the number representing which level this is."
 read loc_lev
 echo "Enter the name of the level up to 30 characters."
-read -n30 maps[$loc_lev,0,0,0]
+read -n30 #maps[$loc_lev,0,0,0]
 echo "What is the horizontal (x) size of you dungeon?"
 read size_x
+size_x=$((size_x+1))
 echo "What is the verticle (y) size of you dungeon?"
 read size_y
+size_y=$((size_y+1))
 tput reset
 echo "${maps[loc_lev,0,0,0]}"
 
 map_builder()
 {
-			for loc_x in {1..10000}
+			# Make the initial outline of the level based on the set size from size_x and size_y variables
+			while [ $loc_x -le $size_x ];
 			do
-				if [ $loc_x -le $size_x ]; then
 					maps[$loc_lev,$loc_x,$loc_y,0]='w'
-					tput cup $((loc_y+5)) $loc_x #&& echo "${maps[$loc_lev,$loc_x,$loc_y,0]}"
-				fi
+					loc_x=$((loc_x+1))
+					#echo "$loc_x"
+					#read -n1
 			done
-			loc_x=0
-			for loc_y in {1..10000}
+			loc_x=1
+			while [ $loc_y -le $size_y ];
 			do
-				if [ $loc_y -le $size_y ]; then
 					maps[$loc_lev,$loc_x,$loc_y,0]='w'
-					tput cup $((loc_y+5)) $loc_x #&& echo "${maps[$loc_lev,$loc_x,$loc_y,0]}"
-				fi
+					loc_y=$((loc_y+1))
 			done
-			for loc_x in {10000..1}
+			loc_y=1
+			while [ $loc_x -le $size_x ];
 			do
-				if [ $loc_x -ge 1 ] && [ $loc_x -le $size_x ]; then
-					loc_y=$size_y
-					maps[$loc_lev,$loc_x,$loc_y,0]='w'
-					tput cup $((loc_y+5)) $loc_x #&& echo "${maps[$loc_lev,$loc_x,$loc_y,0]}"
-				fi
-			done
-			for loc_y in {10000..1}
-			do
-				if [ $loc_y -ge 1 ] && [ $loc_y -le $size_y ]; then
-					loc_x=$size_x
-					maps[$loc_lev,$loc_x,$loc_y,0]='w'
-					tput cup $((loc_y+5)) $loc_x #&& echo "${maps[$loc_lev,$loc_x,$loc_y,0]}"
-				fi
+					maps[$loc_lev,$loc_x,$size_y,0]='w'
+					loc_x=$((loc_x+1))
 			done
 
-			temp_data="w"
+			while [ $loc_y -le $size_y ];
+			do
+					maps[$loc_lev,$size_x,$loc_y,0]='w'
+					loc_y=$((loc_y+1))
+			done
 
+			# Fill the map with game structures
 			
 }
 map_builder
 tput reset
 #read -n1
 
-loc_x=0
-loc_y=0
+loc_x=1
+loc_y=1
 while [ $loc_x -le $size_x ];
 do
 	while [ $loc_y -le $size_y ];
