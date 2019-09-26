@@ -12,6 +12,7 @@ timer=1
 top=0
 btm=0
 final=0
+generated=0
 
 tput reset
 echo "Enter the number representing which level this is."
@@ -20,10 +21,10 @@ read loc_lev
 #read -n30 maps[$loc_lev,0,0,0]
 echo "What is the horizontal (x) size of you dungeon?"
 read size_x
-size_x=$((size_x+1))
+size_x=$((size_x))
 echo "What is the verticle (y) size of you dungeon?"
 read size_y
-size_y=$((size_y+1))
+size_y=$((size_y))
 tput reset
 echo "${maps[loc_lev,0,0,0]}"
 
@@ -32,88 +33,187 @@ map_rand()
 	final=$(((RANDOM % top)+btm))
 }
 
+map_dungeon()
+{
+	#Function for drawing dungeon maps
+	#The walls in this function are linear and symetrical with hallways and cells
+	#This is done by only drawing half the walls then copying them to the other half of the map
+	#Walls may not be placed directly adjacent to the edge of the map
+
+temp_x=$((size_x-1))
+temp_y=$((size_y-1))
+loc_x=1
+wall=0
+if [ "${maps[$loc_sel,$loc_x,$loc_y,0]}" != "e" ];then
+	while [ $loc_x -le $temp_x ];
+	do
+		while [ $loc_y -le $temp_y ];
+		do
+			top=100
+			btm=3
+			map_rand
+			case $final in
+				1|2|3|4|5|6|7|8|9|10|11|12|13|15|15|16|17|18|19|20|78|100 )
+
+					if [ "${maps[$loc_lev,$((loc_x-1)),$loc_y,0]}" != 'e' ] && [ "${maps[$loc_lev,$((loc_x+1)),$loc_y,0]}" != 'e' ] && [ "${maps[$loc_lev,$loc_x,$((loc_y-1)),0]}" != 'e' ] && [ "${maps[$loc_lev,$loc_x,$((loc_y+1)),0]}" != 'e' ]; then
+						maps[$loc_lev,$loc_x,$loc_y,0]='w'
+						wall=$((wall+1))
+					else
+						top=2
+						btm=1
+						map_rand
+						case $final in
+							1 )
+								maps[$loc_lev,$loc_x,$loc_y,0]='.'
+								;;
+							* )
+								maps[$loc_lev,$loc_x,$loc_y,0]='.'
+						esac
+					fi
+					;;
+					* )
+					maps[$loc_lev,$loc_x,$loc_y,0]='.'
+					;;
+			esac
+			loc_y=$((loc_y+1))
+		done
+		loc_y=2
+		loc_x=$((loc_x+1))
+	done
+fi
+}
+
+map_forest()
+{
+	#Turns out that the original random wall placement works pretty well for a forest map
+
+	temp_x=$((size_x-1))
+	temp_y=$((size_y-1))
+	loc_x=1
+	wall=0
+	if [ "${maps[$loc_sel,$loc_x,$loc_y,0]}" != "e" ];then
+		while [ $loc_x -le $temp_x ];
+		do
+			while [ $loc_y -le $temp_y ];
+			do
+				top=100
+				btm=3
+				map_rand
+				case $final in
+					1|2|3|4|5|6|7|8|9|10|11|12|13|15|15|16|17|18|19|20|78|100 )
+
+						maps[$loc_lev,$loc_x,$loc_y,0]='w'
+						wall=$((wall+1))
+						;;
+						* )
+						maps[$loc_lev,$loc_x,$loc_y,0]='.'
+						;;
+				esac
+				loc_y=$((loc_y+1))
+			done
+			loc_y=2
+			loc_x=$((loc_x+1))
+		done
+	fi
+}
+
+map_screen_draw()
+{
+	tput reset
+	loc_x=1
+	loc_y=1
+	if [ $size_x -ge $(tput cols) ]; then
+		max_x=$(tput cols)
+		max_x=$((max_x-2))
+	else
+		max_x=$size_x
+	fi
+	
+	if [ $size_y -ge $(tput lines) ]; then
+		max_y=$(tput lines)
+		max_y=$((max_y-2))
+		#This seems to be an issue with BASH so to avoid drawing the map on 1 more line than is available
+		#I have to make sure that y never equals 43
+		if [ $max_y -eq 43 ]; then
+			max_y=40
+		fi
+	else
+		if [ $size_y -eq 43 ]; then
+			size_y=42
+		fi
+		max_y=$size_y
+	fi
+	echo "$max_x, $max_y | $(tput cols), $(tput lines)"
+	read -n1
+	while [ $loc_x -le $max_x ];
+	do	
+		while [ $loc_y -le $max_y ];
+		do
+			tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,0]}" 
+			loc_y=$((loc_y+1))
+		done
+	loc_y=1
+	loc_x=$((loc_x+1))
+	done
+}
+
 map_builder()
 {
-			# Fill the map with game structures
-			temp_x=$((size_x-1))
-			temp_y=$((size_y-1))
-			loc_x=1
-			wall=0
-			while [ $loc_x -le $temp_x ];
-			do
-				while [ $loc_y -le $temp_x ];
-				do
-					top=100
-					btm=3
-					map_rand
-					case $final in
-						78|100 )
-							maps[$loc_lev,$loc_x,$loc_y,0]='w'
-							wall=$((wall+1))
-							;;
-						* )
-							maps[$loc_lev,$loc_x,$loc_y,0]='.'
-							;;
-					esac
-					loc_y=$((loc_y+1))
-				done
-				loc_y=2
-				loc_x=$((loc_x+1))
-			done
-
-			# Make the initial outline of the level based on the set size from size_x and size_y variables
-			loc_x=1
-			loc_y=1
-			while [ $loc_x -le $size_x ];
-			do
-					maps[$loc_lev,$loc_x,$loc_y,0]='e'
-					loc_x=$((loc_x+1))
-					#echo "$loc_x"
-					#read -n1
-			done
-			loc_x=1
-			while [ $loc_y -le $size_y ];
-			do
-					maps[$loc_lev,$loc_x,$loc_y,0]='e'
-					loc_y=$((loc_y+1))
-			done
-			loc_y=1
-			while [ $loc_x -le $size_x ];
-			do
-					maps[$loc_lev,$loc_x,$size_y,0]='e'
-					loc_x=$((loc_x+1))
-			done
-
-			while [ $loc_y -le $size_y ];
-			do
-					maps[$loc_lev,$size_x,$loc_y,0]='e'
-					loc_y=$((loc_y+1))
-			done
-
-
-}
-map_builder
-tput reset
-#read -n1
-
-loc_x=1
-loc_y=1
-while [ $loc_x -le $size_x ];
-do
-	while [ $loc_y -le $size_y ];
+	generated=$((generated+1))
+	
+	# Make the initial outline of the level based on the set size from size_x and size_y variables
+	loc_x=1
+	loc_y=1
+	while [ $loc_x -le $size_x ];
 	do
-			tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,0]}" 
-# echo "${maps[$loc_lev,$loc_x,$loc_y,0]}"
-			#echo "$loc_x, $loc_y"
-			loc_y=$((loc_y+1))
+			maps[$loc_lev,$loc_x,$loc_y,0]='e'
+			loc_x=$((loc_x+1))
+			#echo "$loc_x"
 			#read -n1
 	done
-loc_y=1
-loc_x=$((loc_x+1))
-done
+	loc_x=1
+	while [ $loc_y -le $size_y ];
+	do
+			maps[$loc_lev,$loc_x,$loc_y,0]='e'
+			loc_y=$((loc_y+1))
+	done
+	loc_y=1
+	while [ $loc_x -le $size_x ];
+	do
+			maps[$loc_lev,$loc_x,$size_y,0]='e'
+			loc_x=$((loc_x+1))
+	done
+	while [ $loc_y -le $size_y ];
+	do
+			maps[$loc_lev,$size_x,$loc_y,0]='e'
+			loc_y=$((loc_y+1))
+	done
 
-loc_y=1
-loc_x=1
-tput cup $(tput lines) 1 && echo "${#maps[*]} ${maps[$loc_lev,$loc_x,$loc_y,0]} ${#maps[$loc_lev,2,2,0]} ${maps[$loc_lev,2,2,0]} | $top $btm $final w = $wall"
+	# Randomly select map type from a list and build
+	top=2
+	btm=1
+	map_rand
+	case $final in
+	1 )
+	#This map is currently almost identicle to the forest map except walls' can't be placed by the edge of
+		#The map. This is just a placeholder while I figure out how to do it the way I want. What I want
+		#to see is a very linear and boxy map with many small rectangles and groups of small rectangles
+		#producing hallways as an emergent property of their orientation
+		map_dungeon
+		;;
+	2 )
+		#This map uses randomly placed 'walls' or trees that go right up to the edge of the map container
+		maps[$loc_lev,0,0,0]="forest"
+		map_forest
+		;;
+	* )
+		map_dungeon
+		;;
+esac
+}
+
+map_builder
+map_screen_draw
+#tput cup $(tput lines) 1 && echo "${#maps[*]} ${maps[$loc_lev,$loc_x,$loc_y,0]} ${#maps[$loc_lev,2,2,0]} ${maps[$loc_lev,2,2,0]} | $top $btm $final w = $wall"
 read -n1
 tput reset
