@@ -1,0 +1,29 @@
+Character Library
+
+Characters are run by functions within the chr_lib.sh. Almost all of the functions in this library are characters but there are
+character support functions as needed too. Focusing on the character functions in general and will later expand to unique
+settings found in specific functions. Here's a list of things that should be included with every character are listed below with
+a description of the object and it's implementation.
+
+Before we get to far it is necessary to show how characters are put together to help you build these characters correctly.
+First, characters are created based on the level of the map where they are produced. This is done exponentially where health is
+equal to 2^level. The first level 1 is 1 and 2 is 4. Level is always a reference to the map level as there is no other type of
+level in the game. To keep it a challenge later in the game energy is the same value times 2/3. This has the effect of preventing
+player characters from scaling too fast and keeps fights a challenge.
+
+Health - This is your characters health where they start at some value and then once at zero when they will be dead.
+
+Energy - This is the pool that NPC's and you get energy for special abalities from. It doesn't matter what kind of character
+is being used magic, ranged, fighter, etc they all use energy for special abalities which scale at 2/3's the rate of health so
+that the character will spend a couple of levels with only 1 point of energy before it doubles. This can and should be adjusted
+for more difficult NPC's.
+
+Speed - this is the rate at which a character can travel excluding all other effects and travel abalities. Speed is a whole number
+value that scales in a linear fashon starting at 1 then on level 2 it would be 2 * 1/3 which is still 1 and will remain that way
+until about level 5 when it increases. The only advantage this grants NPC's is that when they travel faster more of them can find
+the player faster which can become quite a problem when a lot of them locate the player at the same time.
+
+Skill - this value dictates bonuses given to the basic attack which is small, level * 1/10. Basic attack is not meant to scale
+quickly for any character.
+
+
