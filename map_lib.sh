@@ -14,17 +14,19 @@ btm=0
 final=0
 generated=0
 
-tput reset
-echo "Enter the number representing which level this is."
-read loc_lev
+#tput reset
+#echo "Enter the number representing which level this is."
+#read loc_lev
 #echo "Enter the name of the level up to 30 characters."
 #read -n30 maps[$loc_lev,0,0,0]
-echo "What is the horizontal (x) size of you dungeon?"
-read size_x
-size_x=$((size_x))
-echo "What is the verticle (y) size of you dungeon?"
-read size_y
-size_y=$((size_y))
+#echo "What is the horizontal (x) size of you dungeon?"
+#read size_x
+#size_x=$((size_x))
+#echo "What is the verticle (y) size of you dungeon?"
+#read size_y
+#size_y=$((size_y))
+loc_lev=1
+
 tput reset
 echo "${maps[loc_lev,0,0,0]}"
 
@@ -171,7 +173,8 @@ map_builder()
 		#The map. This is just a placeholder while I figure out how to do it the way I want. What I want
 		#to see is a very linear and boxy map with many small rectangles and groups of small rectangles
 		#producing hallways as an emergent property of their orientation
-		map_dungeon
+		#map_dungeon
+		map_forest
 		;;
 	2 )
 		#This map uses randomly placed 'walls' or trees that go right up to the edge of the map container
@@ -179,7 +182,8 @@ map_builder()
 		map_forest
 		;;
 	* )
-		map_dungeon
+		#map_dungeon
+		map_forest
 		;;
 esac
 }
