@@ -6,8 +6,14 @@ declare depth
 loc_lev=0
 loc_x=1
 loc_y=1
-size_x=0
-size_y=0
+tput_x=$(tput cols)
+tput_y=$(tput lines)
+if [ $tput_x -gt 20 ] && [ $tput_y -gt 20 ]; then
+	size_x=$((tput_x-2))
+	size_y=$((tput_y-4))
+else
+	exit 1
+fi
 timer=1
 top=0
 btm=0
@@ -47,6 +53,7 @@ map_dungeon()
 		#is_odd_even y
 		#random between 2 and 4
 		#y_var = ((size_y / 2) - 2) / final
+		true
 	fi
 
 }
@@ -68,12 +75,12 @@ map_forest()
 				btm=3
 				map_rand
 				case $final in
-					1|2|3|4|5|6|7|8|9|10|11|12|13|15|15|16|17|18|19|20 )
+					1|2|3|4|5|6|7|8|9|10|11|12|13|15|15|16|17 )
 
 						maps[$loc_lev,$loc_x,$loc_y,0]='T'
 						wall=$((wall+1))
 						;;
-					21|22|23|24 ) #fallen trees
+					21|22|23 ) #fallen trees
 						if [ "$maps[$loc_lev,$loc_x,$loc_y,0]" != "T" ]; then
 							maps[$loc_lev,$loc_x,$loc_y,0]="t"
 						fi
@@ -117,8 +124,6 @@ map_screen_draw()
 			max_y=$size_y
 		fi
 	fi
-	echo "$max_x, $max_y | $(tput cols), $(tput lines)"
-	read -n1
 	while [ $loc_x -le $max_x ];
 	do	
 		while [ $loc_y -le $max_y ];
@@ -142,8 +147,6 @@ map_builder()
 	do
 			maps[$loc_lev,$loc_x,$loc_y,0]='e'
 			loc_x=$((loc_x+1))
-			#echo "$loc_x"
-			#read -n1
 	done
 	loc_x=1
 	while [ $loc_y -le $size_y ];
