@@ -1,0 +1,4 @@
+Mutual is a library for other libraries.
+Below is a description of the functions in mutual.
+
+rando - generate a random number from the top variable to the btm.
