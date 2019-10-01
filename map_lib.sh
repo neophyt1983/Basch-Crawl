@@ -4,8 +4,14 @@
 . mutual_lib.sh
 
 declare -A maps
+declare -A map_error
+declare -A NPC
+map_err_count=0
 declare depth
 
+NPC[0,0,0,0]=3
+echo "${NPC[0,0,0,0]}"
+read -n1
 loc_lev=0
 loc_x=1
 loc_y=1
@@ -39,11 +45,17 @@ loc_lev=1
 tput reset
 echo "${maps[loc_lev,0,0,0]}"
 
+map_rdr()
+{
+	tput cup $rdr_y $rdr_x && echo "${maps[$loc_lev,$rdr_x,$rdr_y,0]}"
+}
+
 map_cell_blok()
 {
 	#Cells are 4 by 4 walls with a door and blocks are 4 cells
-	cb_x=$((cbt_x-4))
-	cb_y=$((cbt_y-4))
+	cb_x=$((cbt_x-8))
+	cb_y=$((cbt_y-8))
+
 	while [ $cb_x -le $cbt_x ];
 	do
 		maps[$loc_sel,$cb_x,$cbt_y,0]="$bar"
@@ -51,7 +63,12 @@ map_cell_blok()
 		maps[$loc_sel,$cbt_x,$cb_y,0]="$bar"
 		cb_y=$((cb_y+1))
 	done
-	
+}
+
+map_column()
+{
+	#for making support columns
+	true
 }
 
 map_dungeon()
@@ -94,16 +111,19 @@ map_forest()
 				case $final in
 					1|2|3|4|5|6|7|8|9|10|11|12|13|15|15|16|17 )
 
-						maps[$loc_lev,$loc_x,$loc_y,0]="$bar"
+						maps[$loc_lev,$loc_x,$loc_y,0]="${bar}000"
 						wall=$((wall+1))
 						;;
 					21|22|23 ) #fallen trees
-						if [ "$maps[$loc_lev,$loc_x,$loc_y,0]" != "$bar" ]; then
+						if [ "$maps{[$loc_lev,$loc_x,$loc_y,0]:0:4}" != "${bar:0:1}" ]; then
 							maps[$loc_lev,$loc_x,$loc_y,0]="t"
 						fi
 						;;
+					30 )
+						maps[$loc_lev,$loc_x,$loc_y,0]="${maps[$Loc_lev,$Loc_x,$loc_y,0]}s100"
+						;;
 						* )
-						maps[$loc_lev,$loc_x,$loc_y,0]='.'
+						maps[$loc_lev,$loc_x,$loc_y,0]='.000'
 						;;
 				esac
 				loc_y=$((loc_y+1))
@@ -145,7 +165,13 @@ map_screen_draw()
 	do	
 		while [ $loc_y -le $max_y ];
 		do
-			tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,0]}" 
+			dep="${#maps[$loc_lev,$loc_x,$loc_y,0]}"
+			n=0
+			while [ $n -le $dep ]
+			do
+				tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,0]:${n}:1}" 
+				n=$((n+4))
+			done
 			loc_y=$((loc_y+1))
 		done
 	loc_y=1
@@ -207,8 +233,5 @@ esac
 map_builder
 map_screen_draw
 #tput cup $(tput lines) 1 && echo "${#maps[*]} ${maps[$loc_lev,$loc_x,$loc_y,0]} ${#maps[$loc_lev,2,2,0]} ${maps[$loc_lev,2,2,0]} | $top $btm $final w = $wall"
-odev=31
-odd_even
-echo $odev
 read -n1
 tput reset
