@@ -1,43 +1,55 @@
 #!/bin/bash
 
-#Declerations
+. mutual_lib.sh
 . map_lib.sh
-. chr_lib.sh
+#. chr_lib.sh
 
-#Vars
-plyr_x=0
-plyr_y=0
+#game_pid=$(echo $!)
+plyr_x=0	# Players current x location
+plyr_y=0	# Players current y location
+c_x=0		# Players previous x location
+c_y=0		# Players previous y location
+finish=0	# Temporary
+x=2		# Temporary
+y=4		# Temporary
 
 tput civis
+map_builder
 map_screen_draw
-while [ $c_x <= $set_x ] || [ $fini -ne 1 ]
+while [ $x -le $size_x ] || [ $finish -ne 1 ]
 do
-	if [ "${maps[$loc_lev,$loc_x,$loc_y,0]:0:1}" == '.' ]; then
-		plyr_x=$c_x
-		plyr_y=$c_y
-		tput cup $c_y $c_x && echo "@"
-	fi
+	while [ $y -le $size_y ] || [ $finish -lt 1 ]
+	do
+		if [ "${maps[$loc_lev,$x,$y,0]:0:1}" == "." ]; then
+			plyr_x=$x
+			plyr_y=$y
+			c_x=$x
+			c_y=$y
+			tput cup $y $x && echo "@" "$(tput bold)"
+			finish=1
+			break 2
+		fi
+		y=$((y+1))
+	done
+	y=0
+	x=$((x+1))
 done
 while [ "$cmd" != "q" ]
 do
-	read -n1 -t 0.5 cmd
+	tput cup $plyr_y $plyr_x && echo "@" "$(tput bold)"
+	read -n1 -t 0.2 -s cmd
 	case "$cmd" in
 		w )	#Go Up
-			#Check for obsticles
-			#Get new x and y coords
-				#rdr_x=$plyr_x
-				#rdr_y=$plyr_y
-				#plyr_x=$((plyr_x+1))
-			#tput cup $plyr_y $plyr_x & echo "@" & map_rdr
+			tput cup $((plyr_y-1)) $plyr_x && echo "@"
 			;;
 		a )	#Go Left
-
+			tput cup $plyr_y $((plyr_x-1)) && echo "@"
 			;;
 		s )	#Go Down
-
+			tput cup $((plyr_y+1)) $plyr_x && echo "@"
 			;;
 		d )	#Go Left
-
+			tput cup $plyr_y $((plyr_x-1)) && echo "@"
 			;;
 		i )	#Inventory
 

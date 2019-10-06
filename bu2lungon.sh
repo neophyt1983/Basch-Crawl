@@ -1,10 +1,66 @@
 #!/bin/bash
 
-#Libraries
-. mutual_lib.sh
+#Each character type is built as a function that takes configuration from the character
+
+#Declarations
+
+
+chr_imp()
+{
+	#This character is the basic imp which can be found on almost any level
+	echo "RAWR, I'm an imp"
+}
+
+chr_ent()
+{
+	#This is the ent which can mainly be found in wooded settings
+	echo "RAWR, I'm an ent"
+}
+
+chr_sucubus()
+{
+	#This is the sucubus which can mainly be found deep in the underworld and large cities
+	echo "RAWR, I'm a succubus"
+}
+
+chr_demon()
+{
+	#This is the demon which can be found anywhere but is mostly in the underworld
+	echo "RAWR, I'm a demon"
+}
+
+chr_orc()
+{
+	#This is the orc which can be found everywhere but dominantly in deserts
+	echo "RAWR, I'm an orc"
+}
+
+chr_fae()
+{
+	#This is a fae of which there are many varieties which exist in relevant places
+	echo "RAWR, I'm a fae"
+}
+
+chr_elf()
+{
+	#This is an elf which like the fae have a variety of types that exist in relevant places
+	echo "RAWR, I'm an elf"
+}
+#!/bin/bash
+
+rando()
+{
+	final=$(((RANDOM % top)+btm))
+}
+
+odd_even()
+{
+	odev=$(((odev/2)*2))
+}
+#---------------------------------------------------------------------------------------------------------------------------------------------------------
+#map_lib.sh
 
 declare -A maps
-#declare -A maps_oper
 declare -A map_error
 declare -A NPC
 map_err_count=0
@@ -61,12 +117,12 @@ map_dungeon()
 	#Dungeon Builder - this function will work out the usable space of the building area and fill it
 	#with relevant structures and content.
 	if [ "${maps[$loc_sel,$loc_x,$loc_y,0]}" != "e" ]; then
-		odev=$set_x
+		odev=$size_x
 		odd_even
-		if [ $set_x -ne $odev ] && [ $set_x -gt $set_y ]; then
+		if [ $size_x -ne $odev ] && [ $size_x -gt $size_y ]; then
 			true
-		elif [ $set_x -ne $odev ] && [ $set_x -lt $set_y ]; then
-			true			
+		elif [ $size_x -ne $odev ] && [ $size_x -lt $size_y ]; then
+			true
 		else
 			true
 		fi
@@ -95,19 +151,34 @@ map_forest()
 				case $final in
 					1|2|3|4|5|6|7|8|9|10|11|12|13|15|15|16|17 )
 
-						maps[$loc_lev,$loc_x,$loc_y,1]="${bar}000"
+						maps[$loc_lev,$loc_x,$loc_y,1]="${bar}000"		# In the forest map this will be a tree or T
 						wall=$((wall+1))
 						;;
 					21|22|23 ) #fallen trees
 						if [ "$maps{[$loc_lev,$loc_x,$loc_y,0]:0:4}" != "${bar:0:1}" ]; then
-							maps[$loc_lev,$loc_x,$loc_y,1]="t"
+							maps[$loc_lev,$loc_x,$loc_y,4]="t300"		# The tree container
 						fi
 						;;
+
 					30 )
-						maps[$loc_lev,$loc_x,$loc_y,2]="${maps[$Loc_lev,$Loc_x,$loc_y,0]}n100"
+                                                if [ "$maps{[$loc_lev,$loc_x,$loc_y,0]:0:4}" != "${bar:0:1}" ]; then
+							maps[$loc_lev,$loc_x,$loc_y,2]="${maps[$Loc_lev,$Loc_x,$loc_y,2]}n100"	# This is a number 1 forest imp
+						fi
 						;;
-						* )
-						maps[$loc_lev,$loc_x,$loc_y,0]='.000'
+					45 | 78 )
+                                                if [ "$maps{[$loc_lev,$loc_x,$loc_y,0]:0:4}" != "${bar:0:1}" ]; then
+							maps[$loc_lev,$loc_x,$loc_y,3]="${maps[$loc_lev,$loc_x,$loc_y,3]}#100"	# This is a castle door
+						fi
+						;;
+					33 | 87 )
+                                                if [ "$maps{[$loc_lev,$loc_x,$loc_y,0]:0:4}" != "${bar:0:1}" ]; then
+							maps[$loc_lev,$loc_x,$loc_y,3]="${maps[$loc_lev,$loc_x,$loc_y,3]}C200"	# This is a cave door
+						fi
+						;;
+					* )
+                                                if [ "$maps{[$loc_lev,$loc_x,$loc_y,0]:0:4}" != "${bar:0:1}" ]; then
+							maps[$loc_lev,$loc_x,$loc_y,0]='.000'			# The ground
+						fi
 						;;
 				esac
 				loc_y=$((loc_y+1))
@@ -116,6 +187,12 @@ map_forest()
 			loc_x=$((loc_x+1))
 		done
 	fi
+}
+
+map_display_fov()
+{
+	x=0
+	y=0
 }
 
 map_screen_draw()
@@ -129,7 +206,7 @@ map_screen_draw()
 	else
 		max_x=$size_x
 	fi
-	
+
 	if [ $size_y -ge $(tput lines) ]; then
 		max_y=$(tput lines)
 		max_y=$((max_y-2))
@@ -146,17 +223,19 @@ map_screen_draw()
 		fi
 	fi
 	while [ $loc_x -le $max_x ];
-	do	
+	do
 		while [ $loc_y -le $max_y ];
 		do
 			dep="${#maps[$loc_lev,$loc_x,$loc_y,0]}"
 			n=0
 			while [ $n -le $dep ]
 			do
-				#tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,0]:${n}:1}"
-				#tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,1]:${n}:1}"
-				#tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,2]:${n}:1}"
-				#tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,3]:${n}:1}"
+				tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,0]:${n}:1}"
+				tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,1]:${n}:1}"
+				tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,2]:${n}:1}"
+				tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,3]:${n}:1}"
+                                tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,4]:${n}:1}"
+                                tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,5]:${n}:1}"
 				tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,10]:${n}:1}"
 				n=$((n+4))
 			done
@@ -219,51 +298,42 @@ map_builder()
 		;;
 esac
 }
-#!/bin/bash
+#----------------------------------------------------------------------------------------------------------------------------------------------------------
+#lungon.sh
 
-#Declerations
-. map_lib.sh
-. chr_lib.sh
-
-#Vars
 plyr_x=0	# Players current x location
 plyr_y=0	# Players current y location
 c_x=0		# Players previous x location
 c_y=0		# Players previous y location
-finish=0
-x=0
-y=0
-n=0
+finish=0	# Temporary
+x=2		# Temporary
+y=4		# Temporary
 
-map_builder
-maps_oper=("$maps[@]")
 tput civis
+map_builder
 map_screen_draw
-while [ "$x" -le "$size_x" ] || [ "$finish" -ne 1 ]
+while [ $x -le $size_x ] || [ $finish -ne 1 ]
 do
-	while [ "$y" -le "$size_y" ] || [ "$finish" -ne 1 ]
+	while [ $y -le $size_y ] || [ $finish -lt 1 ]
 	do
-		echo "${maps_oper[$loc_lev,$x,$y,10]:0:1}"
-		read -n1
-		#echo "$y"
-		if [ "${maps_oper[$loc_lev,$x,$y,0]:0:1}" != '' ]; then
+		if [ "${maps[$loc_lev,$x,$y,0]:0:1}" == "." ] && [ "${maps[$loc_lev,$((x+1)),$y,10]}" != 'e' ] && [ "${maps[$loc_lev,$((x-1)),$y,10]}" != 'e' ] && [ "${maps[$loc_lev,$x,$((y+1)),10]}" != 'e' ] && [ "${maps[$loc_lev,$x,$((y-1)),10]}" != 'e' ] && [ "${maps[$loc_lev,$((x+1)),$y,10]}" != "${bar}:0:1" ] && [ "${maps[$loc_lev,$((x-1)),$y,0]}" != "${bar}:0:1" ] && [ "${maps[$loc_lev,$x,$((y+1)),0]}" != "${bar}:0:1" ] && [ "${maps[$loc_lev,$x,$((y-1)),10]}" != "${bar}:0:1" ]; then
 			plyr_x=$x
 			plyr_y=$y
 			c_x=$x
 			c_y=$y
-			tput cup $c_y $c_x && echo "@" "$(tput bold)"
+			tput cup $y $x && echo "@" "$(tput bold)"
 			finish=1
+			break 2
 		fi
 		y=$((y+1))
 	done
 	y=0
 	x=$((x+1))
 done
-echo "finished"
-read -n1
 while [ "$cmd" != "q" ]
 do
-	read -n1 -t 0.5 -s cmd
+	tput cup $plyr_y $plyr_x && echo "@" "$(tput bold)"
+	read -n1 -t 0.2 -s cmd
 	case "$cmd" in
 		w )	#Go Up
 			#Check for obsticles

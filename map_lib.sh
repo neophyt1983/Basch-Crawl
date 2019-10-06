@@ -1,18 +1,19 @@
 #!/bin/bash
 
+
+#trap "set +x; sleep 5; set -x" DEBUG
 #Libraries
 . mutual_lib.sh
 
 declare -A maps
+#declare -A maps_oper
 declare -A map_error
 declare -A NPC
 map_err_count=0
-declare depth
 
-NPC[0,0,0,0]=3
-echo "${NPC[0,0,0,0]}"
-read -n1
-loc_lev=0
+#NPC[0,0,0,0]=3		# This variable will hold a list of NPC's in the current stage
+
+loc_lev=1
 loc_x=1
 loc_y=1
 tput_x=$(tput cols)
@@ -28,22 +29,6 @@ top=0
 btm=0
 final=0
 generated=0
-
-#tput reset
-#echo "Enter the number representing which level this is."
-#read loc_lev
-#echo "Enter the name of the level up to 30 characters."
-#read -n30 maps[$loc_lev,0,0,0]
-#echo "What is the horizontal (x) size of you dungeon?"
-#read size_x
-#size_x=$((size_x))
-#echo "What is the verticle (y) size of you dungeon?"
-#read size_y
-#size_y=$((size_y))
-loc_lev=1
-
-tput reset
-echo "${maps[loc_lev,0,0,0]}"
 
 map_rdr()
 {
@@ -100,7 +85,7 @@ map_forest()
 	temp_y=$((size_y-1))
 	loc_x=1
 	wall=0
-	if [ "${maps[$loc_sel,$loc_x,$loc_y,0]}" != "e" ];then
+	if [ "${maps[$loc_sel,$loc_x,$loc_y,10]}" != "e" ];then
 		while [ $loc_x -le $temp_x ];
 		do
 			while [ $loc_y -le $temp_y ];
@@ -111,16 +96,16 @@ map_forest()
 				case $final in
 					1|2|3|4|5|6|7|8|9|10|11|12|13|15|15|16|17 )
 
-						maps[$loc_lev,$loc_x,$loc_y,0]="${bar}000"
+						maps[$loc_lev,$loc_x,$loc_y,1]="${bar}000"
 						wall=$((wall+1))
 						;;
 					21|22|23 ) #fallen trees
 						if [ "$maps{[$loc_lev,$loc_x,$loc_y,0]:0:4}" != "${bar:0:1}" ]; then
-							maps[$loc_lev,$loc_x,$loc_y,0]="t"
+							maps[$loc_lev,$loc_x,$loc_y,1]="t"
 						fi
 						;;
 					30 )
-						maps[$loc_lev,$loc_x,$loc_y,0]="${maps[$Loc_lev,$Loc_x,$loc_y,0]}s100"
+						maps[$loc_lev,$loc_x,$loc_y,2]="${maps[$Loc_lev,$Loc_x,$loc_y,0]}n100"
 						;;
 						* )
 						maps[$loc_lev,$loc_x,$loc_y,0]='.000'
@@ -169,7 +154,11 @@ map_screen_draw()
 			n=0
 			while [ $n -le $dep ]
 			do
-				tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,0]:${n}:1}" 
+				#tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,0]:${n}:1}"
+				#tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,1]:${n}:1}"
+				#tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,2]:${n}:1}"
+				#tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,3]:${n}:1}"
+				tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,10]:${n}:1}"
 				n=$((n+4))
 			done
 			loc_y=$((loc_y+1))
@@ -182,30 +171,30 @@ map_screen_draw()
 map_builder()
 {
 	generated=$((generated+1))
-	
+	depth=$((depth+1))
 	# Make the initial outline of the level based on the set size from size_x and size_y variables
 	loc_x=1
 	loc_y=1
 	while [ $loc_x -le $size_x ];
 	do
-			maps[$loc_lev,$loc_x,$loc_y,0]='e'
+			maps[$loc_lev,$loc_x,$loc_y,10]='e'
 			loc_x=$((loc_x+1))
 	done
 	loc_x=1
 	while [ $loc_y -le $size_y ];
 	do
-			maps[$loc_lev,$loc_x,$loc_y,0]='e'
+			maps[$loc_lev,$loc_x,$loc_y,10]='e'
 			loc_y=$((loc_y+1))
 	done
 	loc_y=1
 	while [ $loc_x -le $size_x ];
 	do
-			maps[$loc_lev,$loc_x,$size_y,0]='e'
+			maps[$loc_lev,$loc_x,$size_y,10]='e'
 			loc_x=$((loc_x+1))
 	done
 	while [ $loc_y -le $size_y ];
 	do
-			maps[$loc_lev,$size_x,$loc_y,0]='e'
+			maps[$loc_lev,$size_x,$loc_y,10]='e'
 			loc_y=$((loc_y+1))
 	done
 
@@ -217,21 +206,17 @@ map_builder()
 	1 )
 		#map_dungeon
 		map_forest
+		maps[$loc_lev,0,0,100]="dungeon"
 		;;
 	2 )
 		#This map uses randomly placed 'walls' or trees that go right up to the edge of the map container
-		maps[$loc_lev,0,0,0]="forest"
+		maps[$loc_lev,0,0,100]="forest"
 		map_forest
 		;;
 	* )
 		#map_dungeon
 		map_forest
+		maps[$loc_lev,0,0,100]="forest"
 		;;
 esac
 }
-
-map_builder
-map_screen_draw
-#tput cup $(tput lines) 1 && echo "${#maps[*]} ${maps[$loc_lev,$loc_x,$loc_y,0]} ${#maps[$loc_lev,2,2,0]} ${maps[$loc_lev,2,2,0]} | $top $btm $final w = $wall"
-read -n1
-tput reset
