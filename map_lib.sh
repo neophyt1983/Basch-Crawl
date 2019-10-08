@@ -10,7 +10,7 @@ declare -A maps
 declare -A map_error
 declare -A NPC
 map_err_count=0
-
+tput bold
 #NPC[0,0,0,0]=3		# This variable will hold a list of NPC's in the current stage
 
 loc_lev=1
@@ -30,9 +30,67 @@ btm=0
 final=0
 generated=0
 
-map_rdr()
+map_fill_path()
 {
-	tput cup $rdr_y $rdr_x && echo "${maps[$loc_lev,$rdr_x,$rdr_y,0]}"
+	vis_x=$((plyr_x-1))
+	vis_y=$((plyr_y-1))
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,0]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,1]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,2]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,3]:0:1}"
+
+	vis_x=$((plyr_x+1))
+	vis_y=$((plyr_y+1))
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,0]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,1]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,2]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,3]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vix_y,10]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vix_y,10]:0:1}"
+
+	vis_x=$((plyr_x+1))
+	vis_y=$((plyr_y-1))
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,0]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,1]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,2]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,3]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vix_y,10]:0:1}"
+
+	vis_x=$((plyr_x-1))
+	vis_y=$((plyr_y+1))
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,0]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,1]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,2]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,3]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vix_y,10]:0:1}"
+
+	vis_x=$((plyr_x+1))
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,0]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,1]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,2]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,3]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vix_y,10]:0:1}"
+
+	vis_y=$((plyr_y+1))
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,0]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,1]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,2]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,3]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vix_y,10]:0:1}"
+
+	vis_x=$((plyr_x-1))
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,0]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,1]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,2]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,3]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vix_y,10]:0:1}"
+
+	vis_y=$((plyr_y-1))
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,0]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,1]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,2]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,3]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vix_y,10]:0:1}"
 }
 
 map_cell_blok()
@@ -130,7 +188,7 @@ map_screen_draw()
 	else
 		max_x=$size_x
 	fi
-	
+
 	if [ $size_y -ge $(tput lines) ]; then
 		max_y=$(tput lines)
 		max_y=$((max_y-2))
@@ -147,7 +205,7 @@ map_screen_draw()
 		fi
 	fi
 	while [ $loc_x -le $max_x ];
-	do	
+	do
 		while [ $loc_y -le $max_y ];
 		do
 			dep="${#maps[$loc_lev,$loc_x,$loc_y,0]}"
@@ -158,7 +216,7 @@ map_screen_draw()
 				#tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,1]:${n}:1}"
 				#tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,2]:${n}:1}"
 				#tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,3]:${n}:1}"
-				tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,10]:${n}:1}"
+				tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,10]:${n}:1}" "$(tput bold)"
 				n=$((n+4))
 			done
 			loc_y=$((loc_y+1))
@@ -189,7 +247,7 @@ map_builder()
 	loc_y=1
 	while [ $loc_x -le $size_x ];
 	do
-			maps[$loc_lev,$loc_x,$size_y,10]='e'
+			maps[$loc_lev,$loc_x,$size_y,9]='e'
 			loc_x=$((loc_x+1))
 	done
 	while [ $loc_y -le $size_y ];

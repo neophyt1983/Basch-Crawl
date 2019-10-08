@@ -1,5 +1,7 @@
 #!/bin/bash
 
+
+#trap "set +x; sleep 5; set -x" DEBUG
 #Libraries
 . mutual_lib.sh
 
@@ -8,13 +10,12 @@ declare -A maps
 declare -A map_error
 declare -A NPC
 map_err_count=0
-declare depth
-
+tput bold
 #NPC[0,0,0,0]=3		# This variable will hold a list of NPC's in the current stage
 
 loc_lev=1
-loc_x=1
-loc_y=1
+lovis_x=1
+lovis_y=1
 tput_x=$(tput cols)
 tput_y=$(tput lines)
 if [ $tput_x -gt 20 ] && [ $tput_y -gt 20 ]; then
@@ -29,9 +30,67 @@ btm=0
 final=0
 generated=0
 
-map_rdr()
+map_fill_path()
 {
-	tput cup $rdr_y $rdr_x && echo "${maps[$loc_lev,$rdr_x,$rdr_y,0]}"
+	vis_x=$((plyr_x-1))
+	vis_y=$((plyr_y-1))
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,0]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,1]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,2]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,3]:0:1}"
+
+	vis_x=$((plyr_x+1))
+	vis_y=$((plyr_y+1))
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,0]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,1]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,2]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,3]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vix_y,10]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vix_y,10]:0:1}"
+
+	vis_x=$((plyr_x+1))
+	vis_y=$((plyr_y-1))
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,0]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,1]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,2]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,3]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vix_y,10]:0:1}"
+
+	vis_x=$((plyr_x-1))
+	vis_y=$((plyr_y+1))
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,0]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,1]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,2]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,3]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vix_y,10]:0:1}"
+
+	vis_x=$((plyr_x+1))
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,0]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,1]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,2]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,3]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vix_y,10]:0:1}"
+
+	vis_y=$((plyr_y+1))
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,0]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,1]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,2]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,3]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vix_y,10]:0:1}"
+
+	vis_x=$((plyr_x-1))
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,0]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,1]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,2]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,3]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vix_y,10]:0:1}"
+
+	vis_y=$((plyr_y-1))
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,0]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,1]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,2]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vis_y,3]:0:1}"
+	tput cup $vis_y $vis_x && echo "${maps[$loc_lev,$vis_x,$vix_y,10]:0:1}"
 }
 
 map_cell_blok()
@@ -129,7 +188,7 @@ map_screen_draw()
 	else
 		max_x=$size_x
 	fi
-	
+
 	if [ $size_y -ge $(tput lines) ]; then
 		max_y=$(tput lines)
 		max_y=$((max_y-2))
@@ -146,7 +205,7 @@ map_screen_draw()
 		fi
 	fi
 	while [ $loc_x -le $max_x ];
-	do	
+	do
 		while [ $loc_y -le $max_y ];
 		do
 			dep="${#maps[$loc_lev,$loc_x,$loc_y,0]}"
@@ -157,7 +216,7 @@ map_screen_draw()
 				#tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,1]:${n}:1}"
 				#tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,2]:${n}:1}"
 				#tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,3]:${n}:1}"
-				tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,10]:${n}:1}"
+				tput cup $loc_y $loc_x && echo "${maps[$loc_lev,$loc_x,$loc_y,10]:${n}:1}" "$(tput bold)"
 				n=$((n+4))
 			done
 			loc_y=$((loc_y+1))
@@ -172,23 +231,23 @@ map_builder()
 	generated=$((generated+1))
 	depth=$((depth+1))
 	# Make the initial outline of the level based on the set size from size_x and size_y variables
-	loc_x=1
-	loc_y=1
+	lovis_x=1
+	lovis_y=1
 	while [ $loc_x -le $size_x ];
 	do
 			maps[$loc_lev,$loc_x,$loc_y,10]='e'
 			loc_x=$((loc_x+1))
 	done
-	loc_x=1
+	lovis_x=1
 	while [ $loc_y -le $size_y ];
 	do
 			maps[$loc_lev,$loc_x,$loc_y,10]='e'
 			loc_y=$((loc_y+1))
 	done
-	loc_y=1
+	lovis_y=1
 	while [ $loc_x -le $size_x ];
 	do
-			maps[$loc_lev,$loc_x,$size_y,10]='e'
+			maps[$loc_lev,$loc_x,$size_y,9]='e'
 			loc_x=$((loc_x+1))
 	done
 	while [ $loc_y -le $size_y ];
@@ -219,122 +278,3 @@ map_builder()
 		;;
 esac
 }
-#!/bin/bash
-
-#Declerations
-. map_lib.sh
-. chr_lib.sh
-
-#Vars
-plyr_x=0	# Players current x location
-plyr_y=0	# Players current y location
-c_x=0		# Players previous x location
-c_y=0		# Players previous y location
-finish=0
-x=0
-y=0
-n=0
-
-map_builder
-maps_oper=("$maps[@]")
-tput civis
-map_screen_draw
-while [ "$x" -le "$size_x" ] || [ "$finish" -ne 1 ]
-do
-	while [ "$y" -le "$size_y" ] || [ "$finish" -ne 1 ]
-	do
-		echo "${maps_oper[$loc_lev,$x,$y,10]:0:1}"
-		read -n1
-		#echo "$y"
-		if [ "${maps_oper[$loc_lev,$x,$y,0]:0:1}" != '' ]; then
-			plyr_x=$x
-			plyr_y=$y
-			c_x=$x
-			c_y=$y
-			tput cup $c_y $c_x && echo "@" "$(tput bold)"
-			finish=1
-		fi
-		y=$((y+1))
-	done
-	y=0
-	x=$((x+1))
-done
-echo "finished"
-read -n1
-while [ "$cmd" != "q" ]
-do
-	read -n1 -t 0.5 -s cmd
-	case "$cmd" in
-		w )	#Go Up
-			#Check for obsticles
-			#Get new x and y coords
-				#rdr_x=$plyr_x
-				#rdr_y=$plyr_y
-				#plyr_x=$((plyr_x+1))
-			#tput cup $plyr_y $plyr_x & echo "@" "$(tput bold)" & map_rdr
-			;;
-		a )	#Go Left
-
-			;;
-		s )	#Go Down
-
-			;;
-		d )	#Go Left
-
-			;;
-		i )	#Inventory
-
-			;;
-		c )	#Consume 1,2,3,4,... Quick Bar
-
-			;;
-		'<' )	#Target previous
-
-			;;
-		'>' )	#Target next
-
-			;;
-		1 )	#Action 1
-
-			;;
-		2 )	#Action 2
-
-			;;
-		3 )	#Action 3
-
-			;;
-		5 )	#Action 4
-
-			;;
-		5 )	#Action 5
-
-			;;
-		6 )	#Action 6
-
-			;;
-		7 )	#Action 7
-
-			;;
-		8 )	#Action 8
-
-			;;
-		9 )	#Action 9
-
-			;;
-		0 )	#Action 0
-
-			;;
-		h )	#Help
-
-			;;
-		~ )	#Save
-			;;
-		*)
-
-			;;
-	esac
-done
-
-read -n1
-tput reset
-exit 0
